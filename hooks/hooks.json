@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${plugin_root}/hooks/session-start.sh",
+            "description": "Load briefings, recent journal, and open tasks into context"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${plugin_root}/hooks/session-end.sh",
+            "description": "Write the journal entry for this session"
+          }
+        ]
+      }
+    ]
+  }
+}

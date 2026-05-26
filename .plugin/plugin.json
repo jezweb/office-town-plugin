@@ -1,0 +1,29 @@
+{
+  "name": "office-town",
+  "version": "0.1.0",
+  "description": "A markdown-shaped methodology for Goose: 4 buildings, 4 roles, wiki-backed substrate. Make your AI agents act like a team that knows the work.",
+  "author": {
+    "name": "Jezweb",
+    "email": "jeremy@jezweb.net",
+    "url": "https://jezweb.com.au"
+  },
+  "homepage": "https://officetown.au",
+  "repository": "https://github.com/jezweb/office-town-plugin",
+  "license": "MIT",
+  "keywords": [
+    "office-town",
+    "goose",
+    "agent-fleet",
+    "cloudflare",
+    "ai",
+    "knowledge-management",
+    "wiki",
+    "mcp",
+    "delegation"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "rules": "./rules/",
+  "hooks": "./hooks/hooks.json"
+}

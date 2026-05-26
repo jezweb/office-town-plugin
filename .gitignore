@@ -1,0 +1,15 @@
+.DS_Store
+*.log
+node_modules/
+.env
+.env.local
+.dev.vars
+
+# Personal artefacts in private repos — when this flips public, uncomment to gitignore entirely
+# .jez/
+.jez/screenshots/
+.jez/**/*.png
+.jez/**/*.jpg
+.jez/**/*.jpeg
+.jez/**/*.mov
+.jez/**/*.mp4

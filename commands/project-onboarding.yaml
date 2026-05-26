@@ -1,0 +1,51 @@
+version: 1.0.0
+title: New project onboarding
+description: Capture a new project's identity, scope, stakeholders, and timeline into wiki/projects/. Boss runs this when the user says "let's start a new project for X".
+parameters:
+  - key: project_name
+    description: Short name for the project (becomes the slug)
+    input_type: string
+    requirement: required
+  - key: client_slug
+    description: Existing client/org slug if applicable
+    input_type: string
+    requirement: optional
+extensions:
+  - office-town-wiki
+prompt: |
+  You are the boss. The user is starting a new project: {{project_name}}.
+
+  Walk through the capture conversationally — not a form.
+
+  ## Capture
+
+  1. **Identity**: full project name, kind (build / consulting / retainer /
+     research), public/internal
+  2. **Client/org**: {{client_slug}} — verify it exists in `wiki/orgs/`. If
+     not, create the org first.
+  3. **Stakeholders**: who's involved (client side + our side)? Cross-link
+     to `wiki/contacts/` entries.
+  4. **Outcome**: what does done look like in plain language?
+  5. **Scope boundary**: what's specifically NOT in this project?
+  6. **Timeline**: start, target completion, key milestones
+  7. **Budget shape**: fixed price / hourly / retainer (don't capture the
+     number unless the user volunteers it — secrets stay in the secrets file)
+  8. **Risks**: anything the user already sees as a risk?
+
+  ## Write
+
+  Create `wiki/projects/{{project_name}}/project.md` with the captured
+  data. Universal sextet + project-specific fields (kind, client_slug,
+  stakeholders, outcome, scope, timeline, risks).
+
+  Optionally seed:
+  - `wiki/projects/{{project_name}}/sessions/` (for multi-session work logs)
+  - `wiki/projects/{{project_name}}/plans/` (for design docs)
+  - `wiki/projects/{{project_name}}/findings/` (for emerging patterns)
+
+  ## Hand back
+
+  Report to the user:
+  - The wiki entry that was created
+  - The next 1-3 obvious steps (delegate to @worker / @librarian / @scout
+    as appropriate)

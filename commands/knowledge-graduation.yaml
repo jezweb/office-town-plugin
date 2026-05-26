@@ -1,0 +1,42 @@
+version: 1.0.0
+title: Knowledge graduation pass
+description: Librarian reviews findings/ across all buildings, graduates the durable ones into wiki/knowledge/. Run weekly or when boss flags the backlog.
+parameters: []
+extensions:
+  - office-town-wiki
+prompt: |
+  You are the librarian. Run a knowledge graduation pass.
+
+  ## Scan
+
+  Read every `buildings/*/findings/` directory. Group findings by topic.
+
+  ## Apply the criteria
+
+  A finding earns graduation to `wiki/knowledge/` when:
+  - It's been observed more than once (a pattern, not a one-off)
+  - It's actionable or load-bearing — future roles need it to act correctly
+  - Removing it would leave a future agent unable to do the right thing
+  - It's portable — a durable rule or fact, not a session-specific anecdote
+
+  Findings that don't graduate stay in `findings/` and decay naturally.
+
+  ## Promote
+
+  For each graduating finding:
+  1. Pick the right collection (`knowledge/`, `decisions/`, `business/`, etc.)
+  2. Check if a related entry already exists. **Extend** it if so; don't duplicate.
+  3. Write with the universal sextet frontmatter + collection-required fields
+  4. Use `wiki.create` (or `wiki.update`)
+  5. Link back to the source finding(s)
+  6. Leave a graduation note in the source finding
+
+  ## Report
+
+  At the end, summarise:
+  - N findings reviewed
+  - N graduated (with links)
+  - N still maturing (kept in findings/)
+  - N skipped as one-offs
+
+  Don't graduate everything. Most should decay.

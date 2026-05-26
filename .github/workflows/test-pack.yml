@@ -1,0 +1,60 @@
+name: Office Town test pack
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'agents/**'
+      - 'skills/**'
+      - 'commands/**'
+      - 'rules/**'
+      - 'hooks/**'
+      - 'tests/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Disabled by default — flip the RUN_TEST_PACK_IN_CI repo variable to true
+    # once OPENROUTER_API_KEY is wired up as a secret. Until then, run locally.
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.RUN_TEST_PACK_IN_CI == 'true' }}
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      GOOSE_PROVIDER: openrouter
+      GOOSE_MODEL: deepseek/deepseek-v4-pro
+      WORKSPACE: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache goose binary
+        id: cache-goose
+        uses: actions/cache@v4
+        with:
+          path: ~/goose-bin
+          key: goose-${{ runner.os }}-stable
+
+      - name: Install goose
+        if: steps.cache-goose.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "$HOME/goose-bin"
+          curl -L https://github.com/block/goose/releases/latest/download/goose-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz -C "$HOME/goose-bin"
+
+      - name: Add goose to PATH
+        run: echo "$HOME/goose-bin" >> "$GITHUB_PATH"
+
+      - name: Clone office-town template (test deployment)
+        run: git clone --depth 1 https://github.com/jezweb/office-town.git "$HOME/test-town"
+
+      - name: Run test pack
+        env:
+          TOWN_ROOT: /home/runner/test-town
+          GOOSE_BIN: /home/runner/goose-bin/goose
+        run: bash tests/runner.sh
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output
+          path: |
+            tests/**/*.log
