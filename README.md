@@ -4,6 +4,16 @@ The plugin-shaped distribution of [Office Town](https://github.com/jezweb/office
 
 Works in any [Open Plugin Spec v1.0.0](https://github.com/vercel-labs/open-plugin-spec) host. Built first for [Goose](https://github.com/block/goose).
 
+## Get started
+
+👉 [INSTALL.md](./INSTALL.md) — paste a prompt into your AI agent, it installs this plugin alongside the Office Town Cloud backend.
+
+Or directly:
+
+```bash
+goose plugin install jezweb/office-town-plugin
+```
+
 ## What's in this plugin
 
 ```
