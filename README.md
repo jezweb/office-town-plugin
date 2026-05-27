@@ -1,18 +1,18 @@
 # Office Town plugin
 
-The plugin-shaped distribution of [Office Town](https://github.com/jezweb/office-town) — a markdown methodology for AI agent fleets. Install once, get the 4 core roles, default skills, recipes, hooks, and town-wide standing orders wired into your AI host.
+The Goose plugin for [Office Town](https://github.com/jezweb/office-town). Install once, get the 4 core roles (boss, librarian, worker, scout), default skills, recipes, hooks, and town-wide standing orders wired into Goose.
 
-Works in any [Open Plugin Spec v1.0.0](https://github.com/vercel-labs/open-plugin-spec) host. Built first for [Goose](https://github.com/block/goose).
+Plugin structure follows [Open Plugin Spec v1.0.0](https://github.com/vercel-labs/open-plugin-spec) — so other conformant hosts (Claude Code, etc.) can consume the same agents/skills/commands files, but v1.0 is built and tested for Goose.
 
 ## Get started
 
-👉 [INSTALL.md](./INSTALL.md) — paste a prompt into your AI agent, it installs this plugin alongside the Office Town Cloud backend.
-
-Or directly:
+Need Goose installed first — https://block.github.io/goose/.
 
 ```bash
 goose plugin install jezweb/office-town-plugin
 ```
+
+Then either install the [Cloudflare backend](https://github.com/jezweb/office-town-cloud) yourself, or paste the agent-install prompts at [INSTALL.md](./INSTALL.md) to do the whole thing in one go.
 
 ## What's in this plugin
 
