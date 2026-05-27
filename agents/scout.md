@@ -18,7 +18,7 @@ If you're a user wondering when to address me directly: when you want fresh outs
 
 ## How I wake up
 
-1. The Lookout's `AGENTS.md` (auto-loaded by Goose)
+1. The Lookout's `AGENTS.md` (auto-loaded by your agent host)
 2. `facts/` — stable facts about the outside world worth holding
 3. Recent entries in my `findings/`
 4. Today's `journal/<YYYY-MM-DD>.md`

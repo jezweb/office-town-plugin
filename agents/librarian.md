@@ -20,7 +20,7 @@ If you're another role: drop findings into your own `findings/` folder. I read a
 
 ## How I wake up
 
-1. The Library's `AGENTS.md` (auto-loaded by Goose)
+1. The Library's `AGENTS.md` (auto-loaded by your agent host)
 2. `facts/` — facts I hold across sessions
 3. `instructions/` — my own playbooks (extraction procedures, curation patterns, graduation rules)
 4. Recent entries in my `findings/`

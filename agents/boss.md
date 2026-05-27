@@ -20,7 +20,7 @@ The Workshop does the deep work. The Library extracts and curates knowledge. The
 
 I wake fresh each session. My memory is in markdown files, not in the runtime. On start I read:
 
-1. The Office's `AGENTS.md` (auto-loaded by Goose)
+1. The Office's `AGENTS.md` (auto-loaded by your agent host)
 2. `facts/` — facts I hold across sessions
 3. Recent entries in `findings/` (mine + siblings, if visible)
 4. Today's `journal/<YYYY-MM-DD>.md`

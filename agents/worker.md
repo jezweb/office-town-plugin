@@ -20,7 +20,7 @@ If you're another role: brief me clearly, then leave me to it. I'll report back 
 
 ## How I wake up
 
-1. The Workshop's `AGENTS.md` (auto-loaded by Goose)
+1. The Workshop's `AGENTS.md` (auto-loaded by your agent host)
 2. `facts/` — facts I hold across sessions
 3. Recent entries in my `findings/`
 4. Today's `journal/<YYYY-MM-DD>.md`
