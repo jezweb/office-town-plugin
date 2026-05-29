@@ -1,6 +1,6 @@
 version: 1.0.0
-title: Process the inbox (filing cabinet)
-description: Work through everything in the cortex inbox/ — convert documents to text, extract the people/orgs/projects/decisions, and file them into the wiki. Handles a big pile patiently and resumably. Run when the owner drops files, or when inbox/ feels heavy.
+title: Process the inbox (manual bulk)
+description: Work through everything in the cortex inbox/ in one patient, resumable pass — convert documents, extract people/orgs/projects/decisions, file them into the wiki. This is the MANUAL bulk counterpart to the filing-cabinet Workflow (which auto-files one file as it lands); run this for a big backlog or "go through my whole inbox now".
 parameters: []
 extensions:
   - office-town-wiki
