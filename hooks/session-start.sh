@@ -59,6 +59,7 @@ count_real() {
 
 owner_files="$(count_real "${WIKI}/owner")"
 inbox_files="$(count_real "${INBOX}")"
+active_workflows=$(grep -rl '^status: active' "${ROOT}/workflows"/*/workflow.md 2>/dev/null | wc -l | tr -d ' ')
 
 # "Populated" = the owner has put real material in beyond the shipped seeds.
 # Seeds live under known slugs (acme-corp, sarah-smith, the doctrine concepts);
@@ -98,6 +99,17 @@ else
   [ "$inbox_files" -gt 0 ] && echo "  • $inbox_files unprocessed file(s) in inbox/ — offer to work through them."
   if [ -n "$recent_file" ]; then
     echo "  • Most recently touched: ${recent_file#$ROOT/}"
+  fi
+fi
+
+# Workflows the cortex owns — standing jobs that fire on triggers. The `workflows`
+# skill explains how to run/define them.
+if [ "${active_workflows:-0}" -gt 0 ]; then
+  echo
+  echo "WORKFLOWS: $active_workflows active (workflows/) — standing jobs the cortex owns."
+  if [ "$inbox_files" -gt 0 ]; then
+    echo "  $inbox_files inbox file(s) may match one (e.g. filing-cabinet for docs,"
+    echo "  meeting-to-actions for recordings). Offer to run the matching workflow(s)."
   fi
 fi
 
