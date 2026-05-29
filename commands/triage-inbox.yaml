@@ -15,16 +15,17 @@ prompt: |
 
   ## For each remaining item
 
-  1. **Get the text.** If it's already markdown/text, read it directly. If it's
-     a PDF, Office doc, image, or audio file, convert it with the files MCP.
-     Inbox files are local and may not be in R2 yet, so pass the bytes as
-     base64 — that always works regardless of sync state:
-       read the local file → base64-encode it →
-       `files(action: 'convert', source: 'base64', source_value: '<base64>',
-        filename: '<original-name>')`
-     That handles PDF, DOCX, XLSX, PPTX, image-OCR, and audio-transcribe. (If a
-     file is already synced to R2 you may instead use `source: 'r2_path'` with
-     its key, e.g. `inbox/foo.pdf` — note the key, not the absolute path.)
+  1. **Get the text.** If it's already markdown/text, read it directly. For a
+     PDF, Office doc, image, or audio file, convert it with the files MCP.
+     The sync daemon mirrors `inbox/` to R2 continuously, so the file is almost
+     always already there — convert it by its R2 key (the path under the cortex,
+     e.g. `inbox/riverside-quote.pdf` — the key, NOT the absolute disk path):
+       `files(action: 'convert', source: 'r2_path',
+        source_value: 'inbox/<name>', filename: '<name>')`
+     That handles PDF, DOCX, XLSX, PPTX, image-OCR, and audio-transcribe.
+     Only if a file isn't in R2 yet (sync hasn't caught up) and it's small,
+     fall back to reading the bytes and passing `source: 'base64'`. Never put a
+     `$(…)` shell substitution inside a tool argument — it won't expand.
   2. **Recognise what it is.** An invoice or quote? A letter? A brochure? A
      dossier response from the onboarding prompts (bio/voice/rhythm/etc.)? A
      contact list? Read enough to know.
