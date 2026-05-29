@@ -15,17 +15,22 @@ prompt: |
 
   ## For each remaining item
 
-  1. **Get the text.** If it's already markdown/text, read it directly. For a
-     PDF, Office doc, image, or audio file, convert it with the files MCP.
-     The sync daemon mirrors `inbox/` to R2 continuously, so the file is almost
-     always already there — convert it by its R2 key (the path under the cortex,
-     e.g. `inbox/riverside-quote.pdf` — the key, NOT the absolute disk path):
+  1. **Get the text.** If it's already markdown/text, read it directly.
+     For a PDF, Office doc, image, or audio file, convert it with the files MCP.
+
+     Understand the sync model: files dropped in `inbox/` mirror up to the
+     owner's Cloudflare automatically, usually within ~10 seconds. You convert
+     from the cloud, not from disk. So convert by the R2 key — the path under
+     the cortex, e.g. `inbox/riverside-quote.pdf` (the key, NOT the absolute
+     disk path):
        `files(action: 'convert', source: 'r2_path',
         source_value: 'inbox/<name>', filename: '<name>')`
-     That handles PDF, DOCX, XLSX, PPTX, image-OCR, and audio-transcribe.
-     Only if a file isn't in R2 yet (sync hasn't caught up) and it's small,
-     fall back to reading the bytes and passing `source: 'base64'`. Never put a
-     `$(…)` shell substitution inside a tool argument — it won't expand.
+     That handles PDF, DOCX, XLSX, PPTX, images, and audio.
+
+     If convert reports the file isn't in the bucket, sync hasn't caught up yet
+     — wait ~10 seconds and try again. Don't read raw bytes, don't base64
+     anything, don't shell out to extract it — let the sync do its job and
+     convert from the cloud.
   2. **Recognise what it is.** An invoice or quote? A letter? A brochure? A
      dossier response from the onboarding prompts (bio/voice/rhythm/etc.)? A
      contact list? Read enough to know.
