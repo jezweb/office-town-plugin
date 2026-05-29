@@ -1,36 +1,56 @@
 version: 1.0.0
-title: Triage librarian inbox
-description: Process pending items in librarian/inbox/ — classify, route to the right collection, file or delegate. Run daily or when inbox starts feeling heavy.
+title: Process the inbox (filing cabinet)
+description: Work through everything in the cortex inbox/ — convert documents to text, extract the people/orgs/projects/decisions, and file them into the wiki. Handles a big pile patiently and resumably. Run when the owner drops files, or when inbox/ feels heavy.
 parameters: []
 extensions:
   - office-town-wiki
+  - office-town-files
 prompt: |
-  You are the librarian. Triage today's inbox.
+  You are the librarian. Work through the owner's inbox — their filing cabinet.
 
-  ## Process each item
+  The inbox is `inbox/` at the cortex root (the folder with AGENTS.md + wiki/).
+  Skip these shipped files, they are not content to process:
+  `_intro.md`, `prompt-quick.md`, `prompt-thorough.md`, and anything already
+  under `inbox/_processed/`.
 
-  For each file in `buildings/library/inbox/` (or whatever the inbox path is
-  for your town), decide one of:
+  ## For each remaining item
 
-  1. **File directly** — clear destination collection, write the wiki entry
-     via `wiki.create`, then move/delete the inbox item.
-  2. **Hold for context** — needs more info; tag with `_inbox_status: holding`
-     and leave a note about what's missing.
-  3. **Route to a role** — delegate to `@worker` or `@scout` to gather what's
-     needed before filing.
-  4. **Discard** — not worth filing; explain why in a finding so the same
-     content doesn't get re-added next time.
+  1. **Get the text.** If it's already markdown/text, read it. If it's a PDF,
+     Office doc, image, or audio file, convert it with
+     `files(action: 'convert', ...)` — that handles PDF, DOCX, XLSX, PPTX,
+     image-OCR, and audio-transcribe.
+  2. **Recognise what it is.** An invoice or quote? A letter? A brochure? A
+     dossier response from the onboarding prompts (bio/voice/rhythm/etc.)? A
+     contact list? Read enough to know.
+  3. **Extract and file.** Pull out the real entities and write them to the
+     wiki via `wiki(action: 'write', ...)` with a genuine `why:`:
+     - companies → `orgs/`, people → `contacts/`, work → `projects/`,
+       choices with rationale → `decisions/`
+     - a dossier response → the `owner/` cascade (voice, rhythm, expertise…)
+       and `business/`
+     - link entities to each other as you go (a contact to their org, a
+       project to its client)
+     Don't duplicate — check if an entry already exists and update it instead.
+  4. **Mark it done.** Move the processed file to `inbox/_processed/` so a
+     re-run doesn't redo it. This is what makes a big pile resumable: stop any
+     time, run again later, only new files get picked up.
 
-  ## File reports
+  ## Work in batches and narrate
 
-  At the end, report:
-  - N items triaged
-  - N filed (with destination collections)
-  - N holding (with what's needed)
-  - N routed (to which role for what)
-  - N discarded (with reason)
+  A filing cabinet can be large. Process in batches of ~10, and after each
+  batch tell the owner what you learned ("filed 3 invoices to orgs/, found a
+  new contact Sarah at Acme, 14 of ~60 done"). They can walk away and come
+  back. Keep going until the inbox is clear or they stop you.
 
-  ## Don't let the inbox accumulate
+  ## When the inbox is clear, pivot to doing
 
-  If items have been "holding" for more than a week, surface them to the user
-  — boss should know about chronic blockers.
+  Summarise what you now understand about their business, then offer the next
+  move — chase overdue invoices, draft a proposal from their best past one,
+  write the follow-ups, set up a morning briefing. Learning was the setup.
+
+  ## Report
+
+  - N items processed (by type: invoices, letters, contacts, …)
+  - What got filed where (collections touched, new entities created)
+  - Anything you couldn't read or weren't sure how to file (left in inbox/)
+  - The single most useful thing you'd suggest doing next

@@ -1,62 +1,110 @@
 #!/usr/bin/env bash
 # SessionStart hook — Office Town
 #
-# Surface today's context for whichever role wakes in this session:
-#   1. The current building's AGENTS.md (Goose loads it automatically — we just confirm presence)
-#   2. Recent findings/ entries (last 5 per building)
-#   3. Today's journal entry for this building
-#   4. Open tasks in tasks/
+# Surfaces cortex state at the start of every session so whichever role wakes
+# here can greet the owner appropriately — orienting a brand-new user, or
+# picking up where a returning one left off.
 #
-# The hook prints structured output that Goose injects into the session as
-# SessionStart context. Failure here must not block the session — we tolerate
-# missing files and missing town roots.
+# Works against the cloud cortex layout (the folder officetowd syncs):
+#   <cortex>/AGENTS.md
+#   <cortex>/inbox/
+#   <cortex>/wiki/{orgs,contacts,projects,owner,...}/
+#
+# Detection order for the cortex root:
+#   1. $OFFICE_TOWN_ROOT if set
+#   2. the cwd, or the nearest ancestor, that contains AGENTS.md + wiki/
+#
+# Failure here must never block the session — missing files are tolerated.
 
 set -u
-TOWN_ROOT="${OFFICE_TOWN_ROOT:-$HOME/Documents/$(basename "$PWD")}"
 
-if [ ! -d "${TOWN_ROOT}/buildings" ]; then
-  # Not in an Office Town deployment. Silent exit — let the agent run normally.
-  exit 0
-fi
+# --- Locate the cortex root -------------------------------------------------
+find_root() {
+  if [ -n "${OFFICE_TOWN_ROOT:-}" ] && [ -d "${OFFICE_TOWN_ROOT}/wiki" ]; then
+    printf '%s' "$OFFICE_TOWN_ROOT"
+    return 0
+  fi
+  local dir="$PWD"
+  while [ "$dir" != "/" ]; do
+    if [ -f "${dir}/AGENTS.md" ] && [ -d "${dir}/wiki" ]; then
+      printf '%s' "$dir"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+  return 1
+}
 
-# Determine which building we're in. Default to office.
-BUILDING="${OFFICE_TOWN_BUILDING:-office}"
-BUILDING_PATH="${TOWN_ROOT}/buildings/${BUILDING}"
-
-if [ ! -d "$BUILDING_PATH" ]; then
-  exit 0
-fi
-
+ROOT="$(find_root)" || exit 0   # not in an Office Town cortex — run normally
+WIKI="${ROOT}/wiki"
+INBOX="${ROOT}/inbox"
 today="$(date +%Y-%m-%d)"
 
-echo "=== Office Town session context ==="
-echo "Town: $TOWN_ROOT"
-echo "Building: $BUILDING"
+# --- Helpers ----------------------------------------------------------------
+# Count real content files in a dir, excluding the structural _intro.md and
+# the onboarding prompts that ship with every cortex.
+count_real() {
+  local dir="$1"; shift
+  [ -d "$dir" ] || { echo 0; return; }
+  local n=0 f base
+  while IFS= read -r f; do
+    base="${f##*/}"
+    case "$base" in
+      _intro.md|prompt-quick.md|prompt-thorough.md) continue ;;
+    esac
+    n=$((n + 1))
+  done < <(find "$dir" -type f -name '*.md' 2>/dev/null; find "$dir" -type f ! -name '*.md' 2>/dev/null)
+  echo "$n"
+}
+
+owner_files="$(count_real "${WIKI}/owner")"
+inbox_files="$(count_real "${INBOX}")"
+
+# "Populated" = the owner has put real material in beyond the shipped seeds.
+# Seeds live under known slugs (acme-corp, sarah-smith, the doctrine concepts);
+# anything else in orgs/contacts/projects is the owner's own.
+real_orgs=$(find "${WIKI}/orgs" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -v '/acme-corp$' | wc -l | tr -d ' ')
+real_contacts=$(find "${WIKI}/contacts" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -v '/sarah-smith$' | wc -l | tr -d ' ')
+real_projects=$(find "${WIKI}/projects" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -v '/acme-renewal-2024$' | wc -l | tr -d ' ')
+real_entities=$(( real_orgs + real_contacts + real_projects ))
+
+# Most recent wiki change (excludes _intro scaffolding).
+recent_file="$(find "$WIKI" -type f -name '*.md' ! -name '_intro.md' -print0 2>/dev/null \
+  | xargs -0 ls -t 2>/dev/null | head -1)"
+
+# --- Emit context -----------------------------------------------------------
+echo "=== Office Town cortex ==="
+echo "Cortex: $ROOT"
 echo
 
-# Recent findings (last 5)
-if [ -d "${BUILDING_PATH}/findings" ]; then
-  echo "Recent findings:"
-  ls -t "${BUILDING_PATH}/findings"/*.md 2>/dev/null | head -5 | while read -r f; do
-    echo "  - ${f##*/}"
-  done
-  echo
-fi
-
-# Today's journal
-journal="${BUILDING_PATH}/journal/${today}.md"
-if [ -f "$journal" ]; then
-  echo "Today's journal exists at: $journal"
-  echo
-fi
-
-# Open tasks
-if [ -d "${BUILDING_PATH}/tasks" ]; then
-  open_count="$(ls "${BUILDING_PATH}/tasks"/*.md 2>/dev/null | wc -l | tr -d ' ')"
-  if [ "${open_count:-0}" -gt 0 ]; then
-    echo "Open tasks: ${open_count}"
+if [ "$owner_files" -eq 0 ] && [ "$real_entities" -eq 0 ]; then
+  # FRESH cortex — only the shipped seeds. This is a first-contact session.
+  echo "STATE: fresh — only the shipped example seeds are here, no owner profile yet."
+  echo "This is almost certainly a new owner. Follow the first-contact protocol in"
+  echo "AGENTS.md: orient them in a few sentences, then offer concrete first moves"
+  echo "(empty their filing cabinet into inbox/, capture a client/project, or a quick"
+  echo "tour) and let them pick. Don't lecture. Don't list every feature."
+  if [ "$inbox_files" -gt 0 ]; then
     echo
+    echo "NOTE: $inbox_files file(s) already waiting in inbox/ — they may have dropped"
+    echo "something to process. Offer to go through it."
   fi
+else
+  # POPULATED — returning owner. Greet where they left off, don't re-introduce.
+  echo "STATE: populated — this owner has real content. Don't re-introduce Office Town."
+  echo "Greet them where they left off and ask what's next."
+  [ "$owner_files" -gt 0 ] && echo "  • Owner profile present in wiki/owner/ — read it; write + speak in their voice."
+  [ "$real_entities" -gt 0 ] && echo "  • $real_entities owner entit(ies) across orgs/contacts/projects."
+  [ "$inbox_files" -gt 0 ] && echo "  • $inbox_files unprocessed file(s) in inbox/ — offer to work through them."
+  if [ -n "$recent_file" ]; then
+    echo "  • Most recently touched: ${recent_file#$ROOT/}"
+  fi
+fi
+
+# Today's journal, if the owner keeps one at the cortex root.
+if [ -f "${ROOT}/journal/${today}.md" ]; then
+  echo
+  echo "Today's journal: journal/${today}.md"
 fi
 
 exit 0
