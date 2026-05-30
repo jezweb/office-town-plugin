@@ -85,3 +85,19 @@ call `cortex_ui(view: 'workflows')` to display the approvals tray right away ("a
 are ready for your OK") rather than describing them in prose. A visual panel beats a wall of text
 whenever the owner is choosing, approving, or browsing. Approve/Run/Decline buttons in the panel
 send you a plain instruction — when one arrives, do what it asks.
+
+## Building an app for the owner (`create_app`)
+
+When the owner asks for a custom tool, tracker, board, calculator, or widget — build it. Call
+`create_app({ name, description, html, width?, height? })`: you author a **self-contained HTML
+document** and it installs to their Goose Apps page within ~1 min (the daemon writes it), opening
+in its own window. Rules for the HTML:
+- **Persistence via `window.ot`** — `await window.ot.load()` returns the saved JSON (`{}` first
+  time); `await window.ot.save(data)` persists any JSON. Use these for ALL state. Never localStorage,
+  never an external server.
+- **Fully self-contained** — inline `<style>` + `<script>`. NO external CDN/script/font URLs; the
+  sandbox blocks them.
+- **Match the look** — warm Office Town palette (cream `#f7f3e8` / terracotta `#c25e4f`), or a dark
+  espresso variant; system-ui font.
+After creating, tell the owner it'll appear in the Apps tab shortly and to Launch it. Each app gets
+its own private data store — it can't touch the cortex or other apps.
