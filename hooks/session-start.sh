@@ -59,7 +59,9 @@ count_real() {
 
 owner_files="$(count_real "${WIKI}/owner")"
 inbox_files="$(count_real "${INBOX}")"
-active_workflows=$(grep -rl '^status: active' "${ROOT}/workflows"/*/workflow.md 2>/dev/null | wc -l | tr -d ' ')
+active_workflows=$(grep -rl '^status: active' "${ROOT}/workflows"/*/trigger.yaml 2>/dev/null | wc -l | tr -d ' ')
+# Drafts awaiting the owner's OK live in workflows/<slug>/pending/ (synced locally).
+pending_drafts=$(find "${ROOT}/workflows"/*/pending -type f 2>/dev/null | wc -l | tr -d ' ')
 
 # "Populated" = the owner has put real material in beyond the shipped seeds.
 # Seeds live under known slugs (acme-corp, sarah-smith, the doctrine concepts);
@@ -77,6 +79,15 @@ recent_file="$(find "$WIKI" -type f -name '*.md' ! -name '_intro.md' -print0 2>/
 echo "=== Office Town cortex ==="
 echo "Cortex: $ROOT"
 echo
+
+# Highest priority: anything waiting for the owner's approval. Surface the visual
+# panel proactively — this is the "you wouldn't have to ask" behaviour.
+if [ "${pending_drafts:-0}" -gt 0 ]; then
+  echo "NEEDS YOU: ${pending_drafts} draft(s) awaiting approval in workflows/*/pending/."
+  echo "Before anything else, open the approvals panel — call cortex_ui(view: 'workflows')"
+  echo "— and tell the owner what's ready. Never send/publish/delete a draft without their OK."
+  echo
+fi
 
 if [ "$owner_files" -eq 0 ] && [ "$real_entities" -eq 0 ]; then
   # FRESH cortex — only the shipped seeds. This is a first-contact session.

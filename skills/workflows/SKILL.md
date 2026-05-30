@@ -58,3 +58,17 @@ Write two files in `workflows/<slug>/`:
 - `trigger.yaml` — `on`, `match`/`cron`, `trust`, `owner`, `status`, `report`.
 Confirm the shape with the owner, then write the files. Pause one by setting `status: paused` in
 its `trigger.yaml`. Keep the goal short — a goal, not a procedure.
+
+## The visual panel (Goose Desktop)
+
+The office-town-workflows MCP exposes ONE UI tool, `cortex_ui`, with a `view` parameter:
+`cortex_ui(view: 'workflows')` (roster + a "Needs you" tray of pending approvals),
+`cortex_ui(view: 'cortex', collection?, slug?)` (visual wiki browser), and
+`cortex_ui(view: 'kit')` (a demo of the interactive controls).
+
+**Surface the panel proactively — don't make the owner ask.** When a session starts, or the owner
+returns after time away, check whether any workflow has drafts in its `pending/` folder. If so,
+call `cortex_ui(view: 'workflows')` to display the approvals tray right away ("a couple of things
+are ready for your OK") rather than describing them in prose. A visual panel beats a wall of text
+whenever the owner is choosing, approving, or browsing. Approve/Run/Decline buttons in the panel
+send you a plain instruction — when one arrives, do what it asks.
