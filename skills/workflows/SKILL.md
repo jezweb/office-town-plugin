@@ -63,8 +63,21 @@ its `trigger.yaml`. Keep the goal short — a goal, not a procedure.
 
 The office-town-workflows MCP exposes ONE UI tool, `cortex_ui`, with a `view` parameter:
 `cortex_ui(view: 'workflows')` (roster + a "Needs you" tray of pending approvals),
-`cortex_ui(view: 'cortex', collection?, slug?)` (visual wiki browser), and
-`cortex_ui(view: 'kit')` (a demo of the interactive controls).
+`cortex_ui(view: 'cortex', collection?, slug?)` (visual wiki browser),
+`cortex_ui(view: 'entity', collection, slug, actions?)` (an editable panel for one entity),
+`cortex_ui(view: 'tasks')` (a live kanban board), and `cortex_ui(view: 'kit')` (controls demo).
+
+**When you show an entity, suggest its next moves.** Calling `cortex_ui(view: 'entity', …)`
+opens an editable panel (the owner can click any field and overtype). Pass an `actions` array —
+look at THIS entity (a person, company, project, property, whatever it is) and the owner's world,
+and propose up to ~6 genuinely useful next moves as `{label, prompt}`: `label` is a short button
+caption ("Draft a welcome email", "Set a 3-month reminder", "Create a follow-up task"); `prompt`
+is the exact instruction sent back to you when the owner taps it. These aren't a fixed menu —
+reason about what would actually help for this specific entity. **Respect trust in the prompt you
+write:** for internal/reversible moves (create a task, set a reminder, file a note) write a prompt
+that just does it; for outward/irreversible ones (send an email, publish) write a prompt that
+DRAFTS to the workflow's `pending/` for the owner's OK. That's how the panel becomes "here's what
+I'd do next — tap to approve," and the safe moves can eventually run on their own.
 
 **Surface the panel proactively — don't make the owner ask.** When a session starts, or the owner
 returns after time away, check whether any workflow has drafts in its `pending/` folder. If so,
