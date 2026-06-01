@@ -34,9 +34,3 @@ Findings that don't graduate go in the journal and decay naturally.
    - Write the entry via `wiki.create` (or update via `wiki.update` if related entry exists)
    - Link back to the finding(s) that earned it
    - Leave a note in the finding marking it graduated
-
-## Anti-patterns
-
-- Graduating every finding — most should decay
-- Writing a wiki entry from a single finding — wait for the second occurrence
-- Writing without checking if an existing entry covers it — extend instead of duplicate
