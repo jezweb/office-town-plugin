@@ -1,3 +1,15 @@
+> # ⚠️ Retired — folded into [office-town-starter](https://github.com/jezweb/office-town-starter)
+>
+> Office Town is now **one self-contained town**, not a town + a separate plugin. The roles,
+> skills, recipes, hooks, and standing orders that used to live here are folded into
+> **[`office-town-starter`](https://github.com/jezweb/office-town-starter)** under `.agents/`
+> (Goose discovers them from the town itself — no `goose plugin install` needed). The town
+> content (buildings + wiki + collections) lives there too.
+>
+> This repo is archived for history. Start from `office-town-starter`.
+
+---
+
 # Office Town plugin
 
 The Goose plugin for [Office Town](https://github.com/jezweb/office-town). Install once, get the 4 core roles (boss, librarian, worker, scout), default skills, recipes, hooks, and town-wide standing orders wired into Goose.
